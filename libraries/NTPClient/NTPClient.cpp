@@ -1,256 +1,76 @@
 #include "NTPClient.h"
-#include <Timer.h>
 
-NTPClient::NTPClient() : m_LocalPort(80), m_TimeServerA(200, 160, 0, 8), m_Hour(0), m_Minute(0), m_UpdateDelay(10000) {
+NTPClient::NTPClient() : m_LocalPort(80), m_TimeServerA(200, 160, 0, 8), m_RequestRateInMillis(5000), m_PreviousRequest(0)
+{
 }
 
-void NTPClient::Initialize() {
-
+void NTPClient::Initialize()
+{
 	bool connected = false;
 
-	while (!connected) {
-		if (Ethernet.begin(m_MacAddress) == 0) {
+	while (!connected)
+	{
+		if (Ethernet.begin(m_MacAddress) == 0)
+		{
 			Serial.println("Failed to configure Ethernet using DHCP.");
 		}
-		else {
+		else
+		{
 			connected = true;
-			Serial.println("Connected.");
 		}
 	}
 
 	m_EthernetUDP.begin(m_LocalPort);
 }
 
-NTPClient::~NTPClient() {
+NTPClient::~NTPClient()
+{
 
 }
 
-void NTPClient::FirstUpdate() {
-	SendNTPpacket(m_TimeServerA);
+// Gets the updated time from a NTP server.
+// Timezone is set to UTC -3:00. 
+unsigned long NTPClient::GetNTPTime()
+{
+	unsigned long start = millis();
 
-	while (!m_EthernetUDP.parsePacket());
-	// We've received a packet, read the data from it
-	m_EthernetUDP.read(m_PacketBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
-
-	// the timestamp starts at byte 40 of the received packet and is four bytes,
-	// or two words, long. First, esxtract the two words:
-
-	unsigned long highWord = word(m_PacketBuffer[40], m_PacketBuffer[41]);
-	unsigned long lowWord = word(m_PacketBuffer[42], m_PacketBuffer[43]);
-	// combine the four bytes (two words) into a long integer
-	// this is NTP time (seconds since Jan 1 1900):
-	unsigned long secsSince1900 = highWord << 16 | lowWord;
-	const unsigned long seventyYears = 2208988800UL;
-	// subtract seventy years:
-	unsigned long epoch = secsSince1900 - seventyYears;
-
-	m_Hour = (epoch % 86400L) / 3600;
-
-	switch (m_Hour)
+	while (true)
 	{
-	case 0:
-		m_Hour = 21;
-		break;
-	case 1:
-		m_Hour = 22;
-		break;
-	case 2:
-		m_Hour = 23;
-		break;
-	case 3:
-		m_Hour = 0;
-		break;
-	case 4:
-		m_Hour = 1;
-		break;
-	case 5:
-		m_Hour = 2;
-		break;
-	case 6:
-		m_Hour = 3;
-		break;
-	case 7:
-		m_Hour = 4;
-		break;
-	case 8:
-		m_Hour = 5;
-		break;
-	case 9:
-		m_Hour = 6;
-		break;
-	case 10:
-		m_Hour = 7;
-		break;
-	case 11:
-		m_Hour = 8;
-		break;
-	case 12:
-		m_Hour = 9;
-		break;
-	case 13:
-		m_Hour = 10;
-		break;
-	case 14:
-		m_Hour = 11;
-		break;
-	case 15:
-		m_Hour = 12;
-		break;
-	case 16:
-		m_Hour = 13;
-		break;
-	case 17:
-		m_Hour = 14;
-		break;
-	case 18:
-		m_Hour = 15;
-		break;
-	case 19:
-		m_Hour = 16;
-		break;
-	case 20:
-		m_Hour = 17;
-	case 21:
-		m_Hour = 18;
-		break;
-	case 22:
-		m_Hour = 19;
-		break;
-	case 23:
-		m_Hour = 20;
-		break;
-	}
+		SendNTPpacket(m_TimeServerA);
 
-	m_Minute = (epoch % 3600) / 60;
-}
+		notEmptyPackage = (m_EthernetUDP.parsePacket() > 0);
 
-void NTPClient::Update() {
-	if (millis() > time_now + m_UpdateDelay) {
-		time_now = millis();
-
-		UpdateTime();
-	}
-}
-
-int NTPClient::GetHour() {
-	return m_Hour;
-}
-
-int NTPClient::GetMinute() {
-	return m_Minute;
-}
-
-void NTPClient::UpdateTime() {
-
-	SendNTPpacket(m_TimeServerA);
-
-	//while (!m_EthernetUDP.parsePacket());
-	if (m_EthernetUDP.parsePacket())
-	{
-
-		// We've received a packet, read the data from it
-		m_EthernetUDP.read(m_PacketBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
-
-		//the timestamp starts at byte 40 of the received packet and is four bytes,
-		// or two words, long. First, esxtract the two words:
-
-		unsigned long highWord = word(m_PacketBuffer[40], m_PacketBuffer[41]);
-		unsigned long lowWord = word(m_PacketBuffer[42], m_PacketBuffer[43]);
-		// combine the four bytes (two words) into a long integer
-		// this is NTP time (seconds since Jan 1 1900):
-		unsigned long secsSince1900 = highWord << 16 | lowWord;
-		const unsigned long seventyYears = 2208988800UL;
-		// subtract seventy years:
-		unsigned long epoch = secsSince1900 - seventyYears;
-
-		m_Hour = (epoch % 86400L) / 3600;
-
-		switch (m_Hour)
+		// Raise flag that a packet is loaded and read it in the buffer
+		if (notEmptyPackage)
 		{
-		case 0:
-			m_Hour = 21;
-			break;
-		case 1:
-			m_Hour = 22;
-			break;
-		case 2:
-			m_Hour = 23;
-			break;
-		case 3:
-			m_Hour = 0;
-			break;
-		case 4:
-			m_Hour = 1;
-			break;
-		case 5:
-			m_Hour = 2;
-			break;
-		case 6:
-			m_Hour = 3;
-			break;
-		case 7:
-			m_Hour = 4;
-			break;
-		case 8:
-			m_Hour = 5;
-			break;
-		case 9:
-			m_Hour = 6;
-			break;
-		case 10:
-			m_Hour = 7;
-			break;
-		case 11:
-			m_Hour = 8;
-			break;
-		case 12:
-			m_Hour = 9;
-			break;
-		case 13:
-			m_Hour = 10;
-			break;
-		case 14:
-			m_Hour = 11;
-			break;
-		case 15:
-			m_Hour = 12;
-			break;
-		case 16:
-			m_Hour = 13;
-			break;
-		case 17:
-			m_Hour = 14;
-			break;
-		case 18:
-			m_Hour = 15;
-			break;
-		case 19:
-			m_Hour = 16;
-			break;
-		case 20:
-			m_Hour = 17;
-		case 21:
-			m_Hour = 18;
-			break;
-		case 22:
-			m_Hour = 19;
-			break;
-		case 23:
-			m_Hour = 20;
+			m_EthernetUDP.read(m_PacketBuffer, NTP_PACKET_SIZE);
+			previousPacketIsLoaded = true;
+
+		}
+		// If the current packet is empty, but a loaded packet exists, break out of the loop
+		else if (!notEmptyPackage && previousPacketIsLoaded)
+		{
+			previousPacketIsLoaded = false;
 			break;
 		}
 
-		m_Minute = (epoch % 3600) / 60;
+		if (millis() - start > 5)
+		{
+			return 0;
+		}
 	}
-}
+	
+	unsigned long end = millis();
 
-unsigned long NTPClient::GetNTPTime() {
+	unsigned long timer = end - start;
 
-	SendNTPpacket(m_TimeServerA);
+	Serial.print("Timer: ");
+	Serial.print(timer);
+	Serial.print(" ms.");
+	Serial.println("");
 
-	while (!m_EthernetUDP.parsePacket());
-	// We've received a packet, read the data from it
-	m_EthernetUDP.read(m_PacketBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
+	notEmptyPackage = false;
+	previousPacketIsLoaded = false;
 
 	//the timestamp starts at byte 40 of the received packet and is four bytes,
 	// or two words, long. First, esxtract the two words:
@@ -262,10 +82,86 @@ unsigned long NTPClient::GetNTPTime() {
 	unsigned long secsSince1900 = highWord << 16 | lowWord;
 	const unsigned long seventyYears = 2208988800UL;
 	// subtract seventy years:
-	return secsSince1900 - seventyYears - 3 * 3600;
+
+	//UTC -3:00
+	int timezone = -3;
+
+	unsigned long updatedTime = secsSince1900 - seventyYears + timezone * 3600;
+
+	PrintTimeFromServer(updatedTime, "UT");
+
+	return updatedTime;
 }
 
-void NTPClient::SendNTPpacket(IPAddress& address) {
+unsigned long NTPClient::InitializeTime()
+{
+	while (true)
+	{
+		SendNTPpacket(m_TimeServerA);
+
+		notEmptyPackage = (m_EthernetUDP.parsePacket() > 0);
+
+		if (notEmptyPackage)
+		{
+			// raise flag that a packet is loaded and read it in the buffer
+			m_EthernetUDP.read(m_PacketBuffer, NTP_PACKET_SIZE);
+			previousPacketIsLoaded = true;
+		}
+		else if (!notEmptyPackage && previousPacketIsLoaded)
+		{
+			// if the current packet is empty, but a loaded packet exists, break out of the loop
+			previousPacketIsLoaded = false;
+			//Serial.println("Achou o pacote correto");
+			Serial.println("Loaded package.");
+			break;
+		}
+	}
+
+	notEmptyPackage = false;
+	previousPacketIsLoaded = false;
+
+	//the timestamp starts at byte 40 of the received packet and is four bytes,
+	// or two words, long. First, esxtract the two words:
+
+	unsigned long highWord = word(m_PacketBuffer[40], m_PacketBuffer[41]);
+	unsigned long lowWord = word(m_PacketBuffer[42], m_PacketBuffer[43]);
+	// combine the four bytes (two words) into a long integer
+	// this is NTP time (seconds since Jan 1 1900):
+	unsigned long secsSince1900 = highWord << 16 | lowWord;
+	const unsigned long seventyYears = 2208988800UL;
+	// subtract seventy years:
+
+	//UTC -3:00
+	int timezone = -3;
+
+	unsigned long updatedTime = secsSince1900 - seventyYears + timezone * 3600;
+
+	PrintTimeFromServer(updatedTime, "IT");
+
+	return updatedTime;
+}
+
+void NTPClient::Update()
+{
+	int result = Ethernet.maintain();
+
+	if (result != 0)
+	{
+		Serial.print("Ethernet.maintain(): ");
+		Serial.println(result);
+	}
+}
+
+void NTPClient::SendNTPpacket(IPAddress& address)
+{
+	if (millis() - m_PreviousRequest < m_RequestRateInMillis)
+	{
+		return;
+	}
+
+	// Update previous request tracker.
+	m_PreviousRequest = millis();
+
 	// set all bytes in the buffer to 0
 	memset(m_PacketBuffer, 0, NTP_PACKET_SIZE);
 	// Initialize values needed to form NTP request
@@ -286,4 +182,48 @@ void NTPClient::SendNTPpacket(IPAddress& address) {
 	m_EthernetUDP.beginPacket(address, 123); //NTP requests are to port 123
 	m_EthernetUDP.write(m_PacketBuffer, NTP_PACKET_SIZE);
 	m_EthernetUDP.endPacket();
+
+	Serial.println("Requested time from NTP server.");
+}
+
+void NTPClient::PrintTimeFromServer(unsigned long updatedTime, const char* tittle)
+{
+	unsigned long hour = (updatedTime % 86400L) / 3600L;
+	unsigned long minute = (updatedTime % 3600L) / 60L;
+	unsigned long second = updatedTime % 60;
+
+	if (hour < 10)
+	{
+		Serial.print("0");
+		Serial.print(hour);
+	}
+	else
+	{
+		Serial.print(hour);
+	}
+	Serial.print(":");
+	if (minute < 10)
+	{
+		Serial.print("0");
+		Serial.print(minute);
+	}
+	else
+	{
+		Serial.print(minute);
+
+	}
+	Serial.print(":");
+	if (second < 10)
+	{
+		Serial.print("0");
+		Serial.print(second);
+	}
+	else
+	{
+		Serial.print(second);
+	}
+	Serial.print(" ");
+	Serial.print(tittle);
+	Serial.print(".");
+	Serial.println("");
 }
