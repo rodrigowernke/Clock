@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Display.h"
+
 class TimeKeeper {
 public:
 	TimeKeeper(unsigned long syncRateInMillis);
@@ -16,6 +18,8 @@ private:
 	void UpdateLocalTime();
 	void SyncTime();
 private:
+	Display m_Display;
+
 	unsigned int m_Hour;
 	unsigned int m_Minute;
 	unsigned int m_Second;
@@ -32,4 +36,8 @@ private:
 
 	//control time update if internet is off
 	bool m_ReadyToUpdateTime;
+
+
+	//test
+	unsigned long m_LeftOverMillis;
 };

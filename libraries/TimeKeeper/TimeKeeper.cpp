@@ -2,7 +2,7 @@
 #include <Arduino.h>
 
 TimeKeeper::TimeKeeper(unsigned long syncRateInMillis) : m_SyncRateInMillis(syncRateInMillis),
-m_CurrentTime(0), m_Hour(0), m_Minute(0), m_Second(0), m_ReadyToUpdateTime(false)
+m_CurrentTime(0), m_Hour(0), m_Minute(0), m_Second(0), m_ReadyToUpdateTime(false), m_LeftOverMillis(0)
 {
 }
 
@@ -14,6 +14,8 @@ TimeKeeper::~TimeKeeper()
 void TimeKeeper::Initialize(unsigned long updatedTime)
 {
 	m_CurrentTime = updatedTime;
+
+	m_PreviousTimeMillis = millis();
 }
 
 unsigned int TimeKeeper::GetHour()
@@ -44,7 +46,6 @@ void TimeKeeper::SyncTime()
 			m_ReadyToUpdateTime = false;
 			m_PreviousSyncMillis = millis();
 			m_PreviousTimeMillis = millis();
-
 		}
 	}
 	else if (millis() - m_PreviousSyncMillis >= m_SyncRateInMillis)
@@ -59,10 +60,10 @@ void TimeKeeper::SyncTime()
 		if (updatedTime != 0)
 		{
 			m_CurrentTime = updatedTime;
-			m_PreviousTimeMillis = millis();
-			m_PreviousSyncMillis = millis();
 
 			m_ReadyToUpdateTime = false;
+			m_PreviousTimeMillis = millis();
+			m_PreviousSyncMillis = millis();
 		}
 		else
 		{
@@ -87,18 +88,26 @@ void TimeKeeper::UpdateLocalTime()
 	unsigned long timeSinceLastUpdate = millis() - m_PreviousTimeMillis;
 
 	// At least one second has passed since last update.
-	if (timeSinceLastUpdate >= 1000)
+	if (timeSinceLastUpdate >= 1000UL)
 	{
+		m_LeftOverMillis += timeSinceLastUpdate - 1000UL;
+
 		m_PreviousTimeMillis += timeSinceLastUpdate;
 
-		unsigned long addedTime = (timeSinceLastUpdate) / 1000;
+		unsigned long addedTime = (timeSinceLastUpdate) / 1000UL;
 
 		// time in seconds since 1970
 		m_CurrentTime += addedTime;
 
-		m_Hour = (m_CurrentTime % 86400L) / 3600L;
-		m_Minute = (m_CurrentTime % 3600L) / 60L;
-		m_Second = m_CurrentTime % 60;
+		if (m_LeftOverMillis >= 1000UL)
+		{
+			m_LeftOverMillis = m_LeftOverMillis - 1000UL;
+			m_CurrentTime += 1;
+		}
+
+		m_Hour = (m_CurrentTime % 86400UL) / 3600UL;
+		m_Minute = (m_CurrentTime % 3600UL) / 60UL;
+		m_Second = m_CurrentTime % 60UL;
 
 		if (m_Hour < 10)
 		{

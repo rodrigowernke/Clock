@@ -12,7 +12,7 @@ void NTPClient::Initialize()
 	{
 		if (Ethernet.begin(m_MacAddress) == 0)
 		{
-			Serial.println("Failed to configure Ethernet using DHCP.");
+			//Serial.println("Failed to configure Ethernet using DHCP.");
 		}
 		else
 		{
@@ -59,15 +59,10 @@ unsigned long NTPClient::GetNTPTime()
 			return 0;
 		}
 	}
-	
+
 	unsigned long end = millis();
 
 	unsigned long timer = end - start;
-
-	Serial.print("Timer: ");
-	Serial.print(timer);
-	Serial.print(" ms.");
-	Serial.println("");
 
 	notEmptyPackage = false;
 	previousPacketIsLoaded = false;
@@ -112,7 +107,7 @@ unsigned long NTPClient::InitializeTime()
 			// if the current packet is empty, but a loaded packet exists, break out of the loop
 			previousPacketIsLoaded = false;
 			//Serial.println("Achou o pacote correto");
-			Serial.println("Loaded package.");
+			//Serial.println("Loaded package.");
 			break;
 		}
 	}
@@ -147,8 +142,8 @@ void NTPClient::Update()
 
 	if (result != 0)
 	{
-		Serial.print("Ethernet.maintain(): ");
-		Serial.println(result);
+		//Serial.print("Ethernet.maintain(): ");
+		//Serial.println(result);
 	}
 }
 
@@ -183,7 +178,7 @@ void NTPClient::SendNTPpacket(IPAddress& address)
 	m_EthernetUDP.write(m_PacketBuffer, NTP_PACKET_SIZE);
 	m_EthernetUDP.endPacket();
 
-	Serial.println("Requested time from NTP server.");
+	//Serial.println("Requested time from NTP server.");
 }
 
 void NTPClient::PrintTimeFromServer(unsigned long updatedTime, const char* tittle)

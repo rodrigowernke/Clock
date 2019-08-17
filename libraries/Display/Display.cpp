@@ -1,7 +1,8 @@
 #include "Display.h"
 #include "Timer.h"
 
-Display::Display() {
+Display::Display()
+{
 	pinMode(D1, OUTPUT);
 	pinMode(D2, OUTPUT);
 	pinMode(D3, OUTPUT);
@@ -12,14 +13,16 @@ Display::Display() {
 	pinMode(D, OUTPUT);
 }
 
-void Display::DisplayTime(int hour, int minutes) {
+void Display::DisplayTime(int hour, int minutes)
+{
 	DisplayHour(hour);
 	Timer::Delay(DELAY);
 	DisplayMinutes(minutes);
 	Timer::Delay(DELAY);
-}	
+}
 
-void Display::DisplayHour(int hour) {
+void Display::DisplayHour(int hour)
+{
 	unsigned int digits[2] = { 0, 0 };
 
 	unsigned int counter = 0;
@@ -38,7 +41,8 @@ void Display::DisplayHour(int hour) {
 	DrawNumber(digits[0], D2);
 }
 
-void Display::DisplayMinutes(int min) {
+void Display::DisplayMinutes(int min)
+{
 	unsigned int digits[2] = { 0, 0 };
 
 	unsigned int counter = 0;
@@ -57,7 +61,8 @@ void Display::DisplayMinutes(int min) {
 	DrawNumber(digits[0], D4);
 }
 
-void Display::DrawNumber(int number, int displayId) {
+void Display::DrawNumber(int number, int displayId)
+{
 	digitalWrite(D1, LOW);
 	digitalWrite(D2, LOW);
 	digitalWrite(D3, LOW);
@@ -67,7 +72,8 @@ void Display::DrawNumber(int number, int displayId) {
 	digitalWrite(C, LOW);
 	digitalWrite(D, LOW);
 
-	switch (number) {
+	switch (number)
+	{
 	case 0:
 		digitalWrite(displayId, HIGH);
 		break;
