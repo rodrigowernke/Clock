@@ -138,7 +138,7 @@ void TimeKeeper::UpdateLocalTime()
 		{
 			Serial.print(m_Second);
 		}
-		Serial.print(" TK.");
+		//Serial.print(" TK.");
 		Serial.println("");
 	}
 }

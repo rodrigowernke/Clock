@@ -16,9 +16,9 @@ Display::Display()
 void Display::DisplayTime(int hour, int minutes)
 {
 	DisplayHour(hour);
-	Timer::Delay(DELAY);
+	Timer::DelayMicros(DELAY);
 	DisplayMinutes(minutes);
-	Timer::Delay(DELAY);
+	//Timer::DelayMicros(DELAY);
 }
 
 void Display::DisplayHour(int hour)
@@ -37,7 +37,7 @@ void Display::DisplayHour(int hour)
 	}
 
 	DrawNumber(digits[1], D1);
-	Timer::Delay(DELAY);
+	Timer::DelayMicros(DELAY);
 	DrawNumber(digits[0], D2);
 }
 
@@ -57,67 +57,258 @@ void Display::DisplayMinutes(int min)
 	}
 
 	DrawNumber(digits[1], D3);
-	Timer::Delay(DELAY);
+	Timer::DelayMicros(DELAY);
 	DrawNumber(digits[0], D4);
+	Timer::DelayMicros(DELAY);
 }
 
 void Display::DrawNumber(int number, int displayId)
 {
-	digitalWrite(D1, LOW);
-	digitalWrite(D2, LOW);
-	digitalWrite(D3, LOW);
-	digitalWrite(D4, LOW);
-	digitalWrite(A, LOW);
-	digitalWrite(B, LOW);
-	digitalWrite(C, LOW);
-	digitalWrite(D, LOW);
+	PORTB = PORTB & B00000000;
+	PORTC = PORTC & B00000000;
+	PORTD = PORTD & B00000000;
 
 	switch (number)
 	{
 	case 0:
-		digitalWrite(displayId, HIGH);
+		if (displayId == D1)
+		{
+			PORTB = PORTB | B00000010;
+		}
+		else if (displayId == D2)
+		{
+			PORTB = PORTB | B00000001;
+		}
+		else if (displayId == D3)
+		{
+			PORTD = PORTD | B10000000;
+		}
+		else if (displayId == D4)
+		{
+			PORTD = PORTD | B01000000;
+		}
 		break;
 	case 1:
-		digitalWrite(displayId, HIGH);
-		digitalWrite(A, HIGH);
+		if (displayId == D1)
+		{
+			PORTB = PORTB | B00000010;
+			PORTC = PORTC | B00000010;
+		}
+		else if (displayId == D2)
+		{
+			PORTB = PORTB | B00000001;
+			PORTC = PORTC | B00000010;
+		}
+		else if (displayId == D3)
+		{
+			PORTD = PORTD | B10000000;
+			PORTC = PORTC | B00000010;
+		}
+		else if (displayId == D4)
+		{
+			PORTD = PORTD | B01000000;
+			PORTC = PORTC | B00000010;
+		}
 		break;
 	case 2:
-		digitalWrite(displayId, HIGH);
-		digitalWrite(B, HIGH);
+		if (displayId == D1)
+		{
+			PORTB = PORTB | B00000010;
+			PORTD = PORTD | B00001000;
+		}
+		else if (displayId == D2)
+		{
+			PORTB = PORTB | B00000001;
+			PORTD = PORTD | B00001000;
+		}
+		else if (displayId == D3)
+		{
+			PORTD = PORTD | B10000000;
+			PORTD = PORTD | B00001000;
+		}
+		else if (displayId == D4)
+		{
+			PORTD = PORTD | B01000000;
+			PORTD = PORTD | B00001000;
+		}
 		break;
 	case 3:
-		digitalWrite(displayId, HIGH);
-		digitalWrite(A, HIGH);
-		digitalWrite(B, HIGH);
+		if (displayId == D1)
+		{
+			PORTB = PORTB | B00000010;
+			PORTD = PORTD | B00001000;
+			PORTC = PORTC | B00000010;
+		}
+		else if (displayId == D2)
+		{
+			PORTB = PORTB | B00000001;
+			PORTD = PORTD | B00001000;
+			PORTC = PORTC | B00000010;
+		}
+		else if (displayId == D3)
+		{
+			PORTD = PORTD | B10000000;
+			PORTD = PORTD | B00001000;
+			PORTC = PORTC | B00000010;
+		}
+		else if (displayId == D4)
+		{
+			PORTD = PORTD | B01000000;
+			PORTD = PORTD | B00001000;
+			PORTC = PORTC | B00000010;
+		}
 		break;
 	case 4:
-		digitalWrite(displayId, HIGH);
-		digitalWrite(C, HIGH);
+		if (displayId == D1)
+		{
+			PORTB = PORTB | B00000010;
+			PORTD = PORTD | B00000100;
+		}
+		else if (displayId == D2)
+		{
+			PORTB = PORTB | B00000001;
+			PORTD = PORTD | B00000100;
+		}
+		else if (displayId == D3)
+		{
+			PORTD = PORTD | B10000000;
+			PORTD = PORTD | B00000100;
+		}
+		else if (displayId == D4)
+		{
+			PORTD = PORTD | B01000000;
+			PORTD = PORTD | B00000100;
+		}
 		break;
 	case 5:
-		digitalWrite(displayId, HIGH);
-		digitalWrite(A, HIGH);
-		digitalWrite(C, HIGH);
+		if (displayId == D1)
+		{
+			PORTB = PORTB | B00000010;
+			PORTC = PORTC | B00000010;
+			PORTD = PORTD | B00000100;
+		}
+		else if (displayId == D2)
+		{
+			PORTB = PORTB | B00000001;
+			PORTC = PORTC | B00000010;
+			PORTD = PORTD | B00000100;
+		}
+		else if (displayId == D3)
+		{
+			PORTD = PORTD | B10000000;
+			PORTC = PORTC | B00000010;
+			PORTD = PORTD | B00000100;
+		}
+		else if (displayId == D4)
+		{
+			PORTD = PORTD | B01000000;
+			PORTC = PORTC | B00000010;
+			PORTD = PORTD | B00000100;
+		}
 		break;
 	case 6:
-		digitalWrite(displayId, HIGH);
-		digitalWrite(B, HIGH);
-		digitalWrite(C, HIGH);
+		if (displayId == D1)
+		{
+			PORTB = PORTB | B00000010;
+			PORTD = PORTD | B00000100;
+			PORTD = PORTD | B00001000;
+		}
+		else if (displayId == D2)
+		{
+			PORTB = PORTB | B00000001;
+			PORTD = PORTD | B00000100;
+			PORTD = PORTD | B00001000;
+		}
+		else if (displayId == D3)
+		{
+			PORTD = PORTD | B10000000;
+			PORTD = PORTD | B00000100;
+			PORTD = PORTD | B00001000;
+		}
+		else if (displayId == D4)
+		{
+			PORTD = PORTD | B01000000;
+			PORTD = PORTD | B00000100;
+			PORTD = PORTD | B00001000;
+		}
 		break;
 	case 7:
-		digitalWrite(displayId, HIGH);
-		digitalWrite(A, HIGH);
-		digitalWrite(B, HIGH);
-		digitalWrite(C, HIGH);
+		if (displayId == D1)
+		{
+			PORTB = PORTB | B00000010;
+			PORTC = PORTC | B00000010;
+			PORTD = PORTD | B00001000;
+			PORTD = PORTD | B00000100;
+		}
+		else if (displayId == D2)
+		{
+			PORTB = PORTB | B00000001;
+			PORTC = PORTC | B00000010;
+			PORTD = PORTD | B00001000;
+			PORTD = PORTD | B00000100;
+		}
+		else if (displayId == D3)
+		{
+			PORTD = PORTD | B10000000;
+			PORTC = PORTC | B00000010;
+			PORTD = PORTD | B00001000;
+			PORTD = PORTD | B00000100;
+		}
+		else if (displayId == D4)
+		{
+			PORTD = PORTD | B01000000;
+			PORTC = PORTC | B00000010;
+			PORTD = PORTD | B00001000;
+			PORTD = PORTD | B00000100;
+		}
 		break;
 	case 8:
-		digitalWrite(displayId, HIGH);
-		digitalWrite(D, HIGH);
+		if (displayId == D1)
+		{
+			PORTB = PORTB | B00000010;
+			PORTC = PORTC | B00000001;
+		}
+		else if (displayId == D2)
+		{
+			PORTB = PORTB | B00000001;
+			PORTC = PORTC | B00000001;
+		}
+		else if (displayId == D3)
+		{
+			PORTD = PORTD | B10000000;
+			PORTC = PORTC | B00000001;
+		}
+		else if (displayId == D4)
+		{
+			PORTD = PORTD | B01000000;
+			PORTC = PORTC | B00000001;
+		}
 		break;
 	case 9:
-		digitalWrite(displayId, HIGH);
-		digitalWrite(A, HIGH);
-		digitalWrite(D, HIGH);
+		if (displayId == D1)
+		{
+			PORTB = PORTB | B00000010;
+			PORTC = PORTC | B00000010;
+			PORTC = PORTC | B00000001;
+		}
+		else if (displayId == D2)
+		{
+			PORTB = PORTB | B00000001;
+			PORTC = PORTC | B00000010;
+			PORTC = PORTC | B00000001;
+		}
+		else if (displayId == D3)
+		{
+			PORTD = PORTD | B10000000;
+			PORTC = PORTC | B00000010;
+			PORTC = PORTC | B00000001;
+		}
+		else if (displayId == D4)
+		{
+			PORTD = PORTD | B01000000;
+			PORTC = PORTC | B00000010;
+			PORTC = PORTC | B00000001;
+		}
 		break;
 	}
 }

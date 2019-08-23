@@ -4,9 +4,7 @@
 
 Display display;
 NTPClient ntpClient;
-TimeKeeper timeKeeper(3600000UL * 24);
-//
-TimeKeeper timeKeeper(10000UL);
+TimeKeeper timeKeeper(36000000UL);
 
 void setup() {
   Serial.begin(9600);

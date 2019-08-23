@@ -2,5 +2,6 @@
 
 class Timer {
 public:
-	static void Delay(long milliseconds);
+	static void DelayMillis(unsigned long milliseconds);
+	static void DelayMicros(unsigned long microseconds);
 };

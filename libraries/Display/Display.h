@@ -19,5 +19,5 @@ private:
 	unsigned int B = 3;
 	unsigned int C = 2;
 	unsigned int D = A0;
-	unsigned int DELAY = 1;
+	unsigned int DELAY = 1000;
 };
