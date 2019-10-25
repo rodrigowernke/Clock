@@ -18,7 +18,6 @@ void Display::DisplayTime(int hour, int minutes)
 	DisplayHour(hour);
 	Timer::DelayMicros(DELAY);
 	DisplayMinutes(minutes);
-	//Timer::DelayMicros(DELAY);
 }
 
 void Display::DisplayHour(int hour)

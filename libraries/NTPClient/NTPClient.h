@@ -19,8 +19,9 @@ private:
 	// UDP package control things
 	bool notEmptyPackage = false;
 	bool previousPacketIsLoaded = false;
-	//
+	
 	byte m_MacAddress[6] = { 0x00, 0x00, 0xAA, 0xBB, 0xCC, 0xDD };
+	byte m_IP[4] = { 192, 168, 17, 90 };
 	unsigned int m_LocalPort;
 	const int NTP_PACKET_SIZE = 48;
 	byte m_PacketBuffer[48];
@@ -34,14 +35,4 @@ private:
 	// request stuff
 	unsigned long m_RequestRateInMillis;
 	unsigned long m_PreviousRequest;
-
-
-
-
-
-
-
-
-
-
 };

@@ -4,7 +4,8 @@
 
 Display display;
 NTPClient ntpClient;
-TimeKeeper timeKeeper(36000000UL);
+TimeKeeper timeKeeper(3600000UL * 4);
+
 
 void setup() {
   Serial.begin(9600);
@@ -16,7 +17,7 @@ void setup() {
 }
 
 void loop() {
-  ntpClient.Update();
+  //ntpClient.Update();
   timeKeeper.Update();
   display.DisplayTime(timeKeeper.GetHour(), timeKeeper.GetMinute());
 }

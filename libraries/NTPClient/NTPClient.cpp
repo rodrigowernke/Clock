@@ -6,20 +6,20 @@ NTPClient::NTPClient() : m_LocalPort(80), m_TimeServerA(200, 160, 0, 8), m_Reque
 
 void NTPClient::Initialize()
 {
-	bool connected = false;
+	Ethernet.begin(m_MacAddress, m_IP);
+	/*bool connected = false;
 
 	while (!connected)
 	{
-		if (Ethernet.begin(m_MacAddress) == 0)
+		if (Ethernet.begin(m_MacAddress, m_IP) == 0)
 		{
-			//Serial.println("Failed to configure Ethernet using DHCP.");
+			Serial.println("Failed to configure Ethernet using DHCP.");
 		}
 		else
 		{
 			connected = true;
 		}
-	}
-
+	}*/
 	m_EthernetUDP.begin(m_LocalPort);
 }
 
@@ -28,7 +28,7 @@ NTPClient::~NTPClient()
 
 }
 
-// Gets the updated time from a NTP server.
+// Get the updated time from a NTP server.
 // Timezone is set to UTC -3:00. 
 unsigned long NTPClient::GetNTPTime()
 {
@@ -54,7 +54,7 @@ unsigned long NTPClient::GetNTPTime()
 			break;
 		}
 
-		if (millis() - start > 5)
+		if (millis() - start > 1)
 		{
 			return 0;
 		}
@@ -67,7 +67,7 @@ unsigned long NTPClient::GetNTPTime()
 	notEmptyPackage = false;
 	previousPacketIsLoaded = false;
 
-	//the timestamp starts at byte 40 of the received packet and is four bytes,
+	// timestamp starts at byte 40 of the received packet and is four bytes,
 	// or two words, long. First, esxtract the two words:
 
 	unsigned long highWord = word(m_PacketBuffer[40], m_PacketBuffer[41]);
@@ -106,8 +106,6 @@ unsigned long NTPClient::InitializeTime()
 		{
 			// if the current packet is empty, but a loaded packet exists, break out of the loop
 			previousPacketIsLoaded = false;
-			//Serial.println("Achou o pacote correto");
-			//Serial.println("Loaded package.");
 			break;
 		}
 	}
@@ -115,7 +113,7 @@ unsigned long NTPClient::InitializeTime()
 	notEmptyPackage = false;
 	previousPacketIsLoaded = false;
 
-	//the timestamp starts at byte 40 of the received packet and is four bytes,
+	// timestamp starts at byte 40 of the received packet and is four bytes,
 	// or two words, long. First, esxtract the two words:
 
 	unsigned long highWord = word(m_PacketBuffer[40], m_PacketBuffer[41]);
@@ -142,8 +140,8 @@ void NTPClient::Update()
 
 	if (result != 0)
 	{
-		//Serial.print("Ethernet.maintain(): ");
-		//Serial.println(result);
+		Serial.print("Ethernet.maintain(): ");
+		Serial.println(result);
 	}
 }
 
